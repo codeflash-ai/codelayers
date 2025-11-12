@@ -317,6 +317,7 @@ def _parse_with_libcst(
             classes=extractor.classes,
             functions=extractor.functions,
             calls=extractor.calls,
+            source_code=source,
         )
 
     except cst.ParserSyntaxError as e:

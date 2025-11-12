@@ -23,20 +23,17 @@ logger = logging.getLogger(__name__)
 def create_module_message(
     parsed: ParsedPython, project_name: str | None
 ) -> CodeMessage:
-    """Create a module-level message."""
-    chunks = []
+    """Create a module-level message with the expected chunk layout."""
 
-    # Module docstring
     if parsed.module_docstring:
-        chunks.append(f"Module docstring:\n{parsed.module_docstring}")
+        summary_text = f"Module docstring:\n{parsed.module_docstring.strip()}"
     else:
-        chunks.append("No module docstring")
+        summary_text = "Module docstring: (none provided)"
 
-    # Imports
+    detail_sections: list[str] = []
     if parsed.imports:
-        chunks.append("Imports:\n" + "\n".join(parsed.imports))
+        detail_sections.append("Imports:\n" + "\n".join(parsed.imports))
 
-    # Overview
     class_names = [c["name"] for c in parsed.classes]
     func_names = [f["name"] for f in parsed.functions]
     overview_parts = []
@@ -45,18 +42,25 @@ def create_module_message(
     if func_names:
         overview_parts.append(f"Functions: {', '.join(func_names)}")
     if overview_parts:
-        chunks.append("Overview:\n" + "\n".join(overview_parts))
+        detail_sections.append("Overview:\n" + "\n".join(overview_parts))
 
-    # Filter out empty chunks
-    chunks = [c for c in chunks if c and c.strip()]
+    detail_text = "\n\n".join(s for s in detail_sections if s.strip())
+    if not detail_text:
+        detail_text = "No imports or symbol overview available."
 
-    # Use ConversationMessageMeta
+    code_text = parsed.source_code or ""
+    if code_text and len(code_text) > 50000:
+        code_text = code_text[:50000] + "\n... (truncated)"
+    if not code_text.strip():
+        code_text = "Module source unavailable."
+
     metadata = ConversationMessageMeta(
-        speaker=parsed.module_path or parsed.file_path, recipients=[]
+        speaker=parsed.module_path or parsed.file_path,
+        recipients=[],
     )
 
     return CodeMessage(
-        text_chunks=chunks,
+        text_chunks=[summary_text, detail_text, code_text],
         metadata=metadata,
         tags=["module", "python", project_name or ""],
     )
@@ -122,33 +126,38 @@ def create_entity_messages_with_jedi(
     for cls in parsed.classes:
         chunks = []
 
-        # Docstring
-        if cls["docstring"]:
-            chunks.append(cls["docstring"])
+        summary_bits: list[str] = []
+        if cls["docstring"] and cls["docstring"].strip():
+            summary_bits.append(cls["docstring"].strip())
 
-        # Class definition with bases
-        bases_str = f"({', '.join(cls['bases'])})" if cls["bases"] else ""
-        chunks.append(f"class {cls['name']}{bases_str}")
-
-        # Add type information from Jedi if available
         cls_key = f"{parsed.module_path}.{cls['name']}"
         if cls_key in jedi_analysis.type_annotations:
             type_info = jedi_analysis.type_annotations[cls_key]
-            if type_info.get("inferred_types"):
-                chunks.append(f"Type: {', '.join(type_info['inferred_types'])}")
+            inferred = [t for t in type_info.get("inferred_types", []) if t]
+            if inferred:
+                summary_bits.append(f"Type hints: {', '.join(inferred)}")
 
-        # Add reference count
         if cls_key in jedi_analysis.references:
             ref_count = len(jedi_analysis.references[cls_key])
-            chunks.append(f"Referenced {ref_count} times in codebase")
+            summary_bits.append(f"Referenced {ref_count} time(s) in codebase")
 
-        chunks.append(cls["code_body"])
+        if cls.get("decorators"):
+            summary_bits.append(
+                "Decorators: " + ", ".join(d for d in cls["decorators"] if d)
+            )
 
-        # Filter out empty chunks
-        chunks = [c for c in chunks if c and c.strip()]
+        summary_text = "\n\n".join(bit for bit in summary_bits if bit)
+        if not summary_text:
+            summary_text = f"Class {cls['name']} summary unavailable."
 
-        if not chunks:
-            continue
+        bases_str = f"({', '.join(cls['bases'])})" if cls["bases"] else ""
+        signature_text = f"class {cls['name']}{bases_str}".strip()
+        if not signature_text:
+            signature_text = f"class {cls['name']}"
+
+        code_text = cls["code_body"] or ""
+        if not code_text.strip():
+            code_text = f"class {cls['name']} body unavailable."
 
         metadata = ConversationMessageMeta(
             speaker=f"{parsed.module_path}:{cls['name']}",
@@ -157,7 +166,7 @@ def create_entity_messages_with_jedi(
 
         messages.append(
             CodeMessage(
-                text_chunks=chunks,
+                text_chunks=[summary_text, signature_text, code_text],
                 metadata=metadata,
                 tags=["class", "python", cls["name"], parsed.module_path],
             )
@@ -165,37 +174,36 @@ def create_entity_messages_with_jedi(
 
         # Method messages with type info
         for method in cls["methods"]:
-            method_chunks = []
+            summary_bits: list[str] = []
+            if method["docstring"] and method["docstring"].strip():
+                summary_bits.append(method["docstring"].strip())
 
-            if method["docstring"]:
-                method_chunks.append(method["docstring"])
-
-            method_chunks.append(method["signature"])
-
-            # Add parameter type information
             method_key = f"{parsed.module_path}.{cls['name']}.{method['name']}"
             param_info = []
             for param in method.get("parameters", []):
                 param_key = f"{method['name']}.{param}"
                 if param_key in jedi_analysis.type_annotations:
                     type_data = jedi_analysis.type_annotations[param_key]
-                    if type_data.get("inferred_types"):
+                    inferred = [t for t in type_data.get("inferred_types", []) if t]
+                    if inferred:
                         param_info.append(
-                            f"  {param}: {', '.join(type_data['inferred_types'])}"
+                            f"{param}: {', '.join(inferred)}"
                         )
 
             if param_info:
-                method_chunks.append(
+                summary_bits.append(
                     "Inferred parameter types:\n" + "\n".join(param_info)
                 )
 
-            method_chunks.append(method["code_body"])
+            summary_text = "\n\n".join(bit for bit in summary_bits if bit)
+            if not summary_text:
+                summary_text = f"Method {method['name']} summary unavailable."
 
-            # Filter out empty chunks
-            method_chunks = [c for c in method_chunks if c and c.strip()]
+            signature_text = method["signature"].strip() or method["name"]
 
-            if not method_chunks:
-                continue
+            code_text = method["code_body"] or ""
+            if not code_text.strip():
+                code_text = f"Method {method['name']} body unavailable."
 
             method_metadata = ConversationMessageMeta(
                 speaker=f"{parsed.module_path}:{cls['name']}.{method['name']}",
@@ -204,7 +212,7 @@ def create_entity_messages_with_jedi(
 
             messages.append(
                 CodeMessage(
-                    text_chunks=method_chunks,
+                    text_chunks=[summary_text, signature_text, code_text],
                     metadata=method_metadata,
                     tags=["method", "python", method["name"], cls["name"]],
                 )
@@ -212,42 +220,40 @@ def create_entity_messages_with_jedi(
 
     # Function messages with type info
     for func in parsed.functions:
-        chunks = []
+        summary_bits: list[str] = []
+        if func["docstring"] and func["docstring"].strip():
+            summary_bits.append(func["docstring"].strip())
 
-        if func["docstring"]:
-            chunks.append(func["docstring"])
-
-        chunks.append(func["signature"])
-
-        # Add parameter type information
         func_key = f"{parsed.module_path}.{func['name']}"
         param_info = []
         for param in func.get("parameters", []):
             param_key = f"{func['name']}.{param}"
             if param_key in jedi_analysis.type_annotations:
                 type_data = jedi_analysis.type_annotations[param_key]
-                if type_data.get("inferred_types"):
-                    param_info.append(
-                        f"  {param}: {', '.join(type_data['inferred_types'])}"
-                    )
+                inferred = [t for t in type_data.get("inferred_types", []) if t]
+                if inferred:
+                    param_info.append(f"{param}: {', '.join(inferred)}")
 
         if param_info:
-            chunks.append("Inferred parameter types:\n" + "\n".join(param_info))
+            summary_bits.append(
+                "Inferred parameter types:\n" + "\n".join(param_info)
+            )
 
-        # Add return type if available
         return_key = f"{func['name']}.__return__"
         if return_key in jedi_analysis.type_annotations:
             ret_data = jedi_analysis.type_annotations[return_key]
             if ret_data.get("declared_type"):
-                chunks.append(f"Return type: {ret_data['declared_type']}")
+                summary_bits.append(f"Return type: {ret_data['declared_type']}")
 
-        chunks.append(func["code_body"])
+        summary_text = "\n\n".join(bit for bit in summary_bits if bit)
+        if not summary_text:
+            summary_text = f"Function {func['name']} summary unavailable."
 
-        # Filter out empty chunks
-        chunks = [c for c in chunks if c and c.strip()]
+        signature_text = func["signature"].strip() or func["name"]
 
-        if not chunks:
-            continue
+        code_text = func["code_body"] or ""
+        if not code_text.strip():
+            code_text = f"Function {func['name']} body unavailable."
 
         metadata = ConversationMessageMeta(
             speaker=f"{parsed.module_path}:{func['name']}",
@@ -256,7 +262,7 @@ def create_entity_messages_with_jedi(
 
         messages.append(
             CodeMessage(
-                text_chunks=chunks,
+                text_chunks=[summary_text, signature_text, code_text],
                 metadata=metadata,
                 tags=["function", "python", func["name"], parsed.module_path],
             )
