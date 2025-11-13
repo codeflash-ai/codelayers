@@ -105,6 +105,7 @@ class ParsedPython:
     classes: list[dict]
     functions: list[dict]
     calls: list[dict]
+    source_code: str
 
 
 class FileKind(TypedDict):
