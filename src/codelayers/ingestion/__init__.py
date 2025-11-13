@@ -1,6 +1,6 @@
 """Repository ingestion package for semantic code indexing."""
 
-from codequery.ingestion.models import (
+from codelayers.ingestion.models import (
     IngestOptions,
     IngestResult,
     ProgressUpdate,

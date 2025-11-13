@@ -12,7 +12,7 @@ from rich.panel import Panel
 from rich.table import Table
 from rich.markdown import Markdown
 
-from codequery.ingestion.runner import (
+from codelayers.ingestion.runner import (
     run_ingestion,
     IngestionProgress,
     IngestionComplete,
@@ -25,7 +25,7 @@ console = Console()
 
 
 @click.group()
-@click.version_option(version="0.1.0", prog_name="codequery")
+@click.version_option(version="0.1.0", prog_name="codelayers")
 def cli():
     """CodeQuery - Semantic Code Search for Python repositories.
     
@@ -54,8 +54,8 @@ def ingest(repo_path: Path, output: Optional[Path], quiet: bool):
     REPO_PATH: Path to the Python repository to index
     
     Example:
-        codequery ingest /path/to/my/project
-        codequery ingest ~/code/django -o django.db
+        codelayers ingest /path/to/my/project
+        codelayers ingest ~/code/django -o django.db
     """
     asyncio.run(_run_ingest(repo_path, output, quiet))
 
@@ -136,9 +136,9 @@ def query(query: str, database: Optional[Path], markdown: bool):
     QUERY: Natural language question about the code
     
     Example:
-        codequery query "How does authentication work?"
-        codequery query "Find all API endpoints" -d myproject.db
-        codequery query "Where is the user model defined?" --markdown
+        codelayers query "How does authentication work?"
+        codelayers query "Find all API endpoints" -d myproject.db
+        codelayers query "Where is the user model defined?" --markdown
     """
     asyncio.run(_run_query(query, database, markdown))
 
@@ -151,7 +151,7 @@ async def _run_query(query_text: str, db_path: Optional[Path], markdown_output: 
         db_files = list(Path.cwd().glob("*.db"))
         if not db_files:
             console.print("[red]✗ No database files found in current directory[/]")
-            console.print("Run 'codequery ingest' first or specify a database with -d")
+            console.print("Run 'codelayers ingest' first or specify a database with -d")
             sys.exit(1)
         db_path = db_files[0]
         if len(db_files) > 1:
@@ -196,8 +196,8 @@ def list_dbs(directory: Path):
     """List all indexed databases in a directory.
     
     Example:
-        codequery list-dbs
-        codequery list-dbs -d ~/projects
+        codelayers list-dbs
+        codelayers list-dbs -d ~/projects
     """
     db_files = list(directory.glob("*.db"))
     
@@ -224,7 +224,7 @@ def info(database: Path):
     DATABASE: Path to the database file
     
     Example:
-        codequery info myproject.db
+        codelayers info myproject.db
     """
     asyncio.run(_show_db_info(database))
 
@@ -263,9 +263,9 @@ def tui():
     Opens the full Textual-based UI for browsing and querying.
     
     Example:
-        codequery tui
+        codelayers tui
     """
-    from codequery.app import main as tui_main
+    from codelayers.app import main as tui_main
     tui_main()
 
 

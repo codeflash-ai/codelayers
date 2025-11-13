@@ -7,7 +7,7 @@ from textual.widgets import Header, Footer
 from textual.reactive import reactive
 from textual.binding import Binding
 
-from codequery.ui import RepoBrowserWidget, QueryInterfaceWidget, IngestionModal
+from codelayers.ui import RepoBrowserWidget, QueryInterfaceWidget, IngestionModal
 
 
 class CodeQueryApp(App):

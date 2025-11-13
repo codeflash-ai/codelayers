@@ -6,10 +6,10 @@ from typing import TYPE_CHECKING
 
 from typeagent.knowpro.universal_message import ConversationMessageMeta
 
-from codequery.ingestion.models import CodeMessage, ParsedPython
+from codelayers.ingestion.models import CodeMessage, ParsedPython
 
 if TYPE_CHECKING:
-    from codequery.ingestion.jedi_analyzer import JediAnalysis
+    from codelayers.ingestion.jedi_analyzer import JediAnalysis
 
 
 logger = logging.getLogger(__name__)

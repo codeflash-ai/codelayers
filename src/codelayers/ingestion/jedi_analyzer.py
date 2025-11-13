@@ -7,7 +7,7 @@ import aiofiles
 
 import jedi
 
-from codequery.ingestion.models import ParsedPython
+from codelayers.ingestion.models import ParsedPython
 
 
 logger = logging.getLogger(__name__)

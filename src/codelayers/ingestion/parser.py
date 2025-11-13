@@ -8,8 +8,8 @@ import aiofiles
 import libcst as cst
 from libcst.metadata import MetadataWrapper, PositionProvider
 
-from codequery.ingestion.models import ParsedPython
-from codequery.ingestion.discovery import compute_module_path
+from codelayers.ingestion.models import ParsedPython
+from codelayers.ingestion.discovery import compute_module_path
 
 
 logger = logging.getLogger(__name__)

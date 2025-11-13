@@ -1,5 +1,5 @@
 [project]
-name = "codequery"
+name = "codelayers"
 version = "0.1.0"
 requires-python = ">=3.12"
 description = "Semantic code search TUI for Python repositories"
@@ -24,8 +24,8 @@ dependencies = [
 ]
 
 [project.scripts]
-codequery = "codequery.cli:main"
-codequery-tui = "codequery.app:main"
+codelayers = "codelayers.cli:main"
+codelayers-tui = "codelayers.app:main"
 
 [tool.uv]
 package = true

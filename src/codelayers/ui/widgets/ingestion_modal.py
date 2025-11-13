@@ -11,7 +11,7 @@ from textual.widget import Widget
 from textual.widgets import Button, Static, ProgressBar, Label
 from textual.reactive import reactive
 
-from codequery.ingestion.runner import (
+from codelayers.ingestion.runner import (
     StageState,
     IngestionProgress,
     IngestionComplete,

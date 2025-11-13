@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-from codequery.ingestion.models import FileKind
+from codelayers.ingestion.models import FileKind
 
 
 # =============================================================================

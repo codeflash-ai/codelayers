@@ -8,15 +8,15 @@ from pathlib import Path
 from typing import AsyncGenerator, NamedTuple, Literal
 from dataclasses import dataclass
 
-from codequery.ingestion.discovery import discover_files
-from codequery.ingestion.parser import parse_python_file
-from codequery.ingestion.messages import (
+from codelayers.ingestion.discovery import discover_files
+from codelayers.ingestion.parser import parse_python_file
+from codelayers.ingestion.messages import (
     create_module_message,
     create_entity_messages_with_jedi,
     parse_text_file,
 )
-from codequery.ingestion.models import CodeMessage, IngestResult
-from codequery.ingestion.jedi_analyzer import analyze_python_file_with_jedi
+from codelayers.ingestion.models import CodeMessage, IngestResult
+from codelayers.ingestion.jedi_analyzer import analyze_python_file_with_jedi
 from typeagent import create_conversation
 
 logger = logging.getLogger(__name__)
