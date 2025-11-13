@@ -1,0 +1,136 @@
+/* CodeQuery TUI Styles - Following Textual Best Practices */
+
+/* Global Application Styles */
+Screen {
+    background: $surface;
+}
+
+Header {
+    background: $primary;
+    color: $text;
+    text-style: bold;
+}
+
+Footer {
+    background: $panel;
+}
+
+/* Repository Browser Styles */
+RepoBrowserWidget {
+    width: 100%;
+    height: 100%;
+    background: $surface;
+}
+
+RepoBrowserWidget #browser_container {
+    background: $surface;
+}
+
+RepoBrowserWidget DirectoryTree {
+    scrollbar-background: $panel;
+    scrollbar-color: $primary;
+    scrollbar-corner-color: $panel;
+    padding: 0;
+}
+
+RepoBrowserWidget DirectoryTree:focus {
+}
+
+RepoBrowserWidget Button {
+    min-width: 16;
+}
+
+RepoBrowserWidget Button:hover {
+    background: $primary-lighten-1;
+}
+
+RepoBrowserWidget Input:focus {
+}
+
+/* Query Interface Styles */
+QueryInterfaceWidget {
+    width: 100%;
+    height: 100%;
+    background: $surface;
+}
+
+QueryInterfaceWidget #query_container {
+    background: $surface;
+}
+
+QueryInterfaceWidget Select:focus {
+}
+
+QueryInterfaceWidget Input:focus {
+}
+
+QueryInterfaceWidget RichLog {
+    background: $panel;
+    scrollbar-background: $panel;
+    scrollbar-color: $accent;
+}
+
+QueryInterfaceWidget Button:hover {
+    background: $primary-lighten-1;
+}
+
+/* Ingestion Modal Styles */
+IngestionModal {
+    background: $surface 50%;
+}
+
+IngestionModal #modal_container {
+    box-sizing: border-box;
+}
+
+IngestionModal ProgressBar {
+    color: $success;
+}
+
+IngestionModal ProgressBar > .bar--bar {
+    color: $success;
+}
+
+IngestionModal ProgressBar > .bar--complete {
+    color: $success;
+}
+
+IngestionModal RichLog {
+    background: $panel;
+    scrollbar-background: $panel;
+    scrollbar-color: $primary;
+}
+
+IngestionModal Button:hover {
+    background: $primary-lighten-1;
+}
+
+/* Common Widget Patterns */
+.panel {
+    background: $panel;
+    padding: 1;
+}
+
+.highlight {
+    background: $accent 20%;
+    color: $accent;
+}
+
+.success-text {
+    color: $success;
+    text-style: bold;
+}
+
+.error-text {
+    color: $error;
+    text-style: bold;
+}
+
+.warning-text {
+    color: $warning;
+    text-style: bold;
+}
+
+.muted-text {
+    color: $text-muted;
+}

@@ -1,0 +1,34 @@
+[project]
+name = "codequery"
+version = "0.1.0"
+requires-python = ">=3.12"
+description = "Semantic code search TUI for Python repositories"
+authors = [{name = "KRRT7"}]
+readme = "README.md"
+keywords = ["tui", "semantic-search", "code-search", "textual"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+]
+dependencies = [
+    "aiofiles>=24.1.0",
+    "jedi>=0.19.2",
+    "libcst>=1.8.5",
+    "textual>=6.6.0",
+    "typeagent",
+    "click>=8.1.0",
+    "rich>=13.0.0",
+]
+
+[project.scripts]
+codequery = "codequery.cli:main"
+codequery-tui = "codequery.app:main"
+
+[tool.uv]
+package = true
+
+[tool.uv.sources]
+typeagent = { path = "../typeagent-py", editable = true }
