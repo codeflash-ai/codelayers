@@ -186,9 +186,7 @@ def create_entity_messages_with_jedi(
                     type_data = jedi_analysis.type_annotations[param_key]
                     inferred = [t for t in type_data.get("inferred_types", []) if t]
                     if inferred:
-                        param_info.append(
-                            f"{param}: {', '.join(inferred)}"
-                        )
+                        param_info.append(f"{param}: {', '.join(inferred)}")
 
             if param_info:
                 summary_bits.append(
@@ -235,9 +233,7 @@ def create_entity_messages_with_jedi(
                     param_info.append(f"{param}: {', '.join(inferred)}")
 
         if param_info:
-            summary_bits.append(
-                "Inferred parameter types:\n" + "\n".join(param_info)
-            )
+            summary_bits.append("Inferred parameter types:\n" + "\n".join(param_info))
 
         return_key = f"{func['name']}.__return__"
         if return_key in jedi_analysis.type_annotations:

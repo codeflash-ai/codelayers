@@ -15,7 +15,7 @@ class CodeQueryApp(App):
 
     TITLE = "CodeQuery - Semantic Code Search"
     CSS_PATH = "ui/styles.tcss"
-    
+
     BINDINGS = [
         Binding("q", "quit", "Quit", priority=True),
         Binding("ctrl+c", "quit", "Quit", show=False),
@@ -36,15 +36,17 @@ class CodeQueryApp(App):
         self.query_one(Header).tall = False
 
     @on(RepoBrowserWidget.IngestRequested)
-    def handle_ingest_requested(self, message: RepoBrowserWidget.IngestRequested) -> None:
+    def handle_ingest_requested(
+        self, message: RepoBrowserWidget.IngestRequested
+    ) -> None:
         """Handle repository ingestion request."""
-        
+
         def handle_ingestion_result(result: Path | None) -> None:
             """Handle the result of ingestion modal."""
             if result:
                 self.current_db = result
                 self._switch_to_query_mode(result)
-        
+
         self.push_screen(IngestionModal(message.path), handle_ingestion_result)
 
     @on(RepoBrowserWidget.QueryRequested)
@@ -53,7 +55,9 @@ class CodeQueryApp(App):
         self._switch_to_query_mode()
 
     @on(QueryInterfaceWidget.BackRequested)
-    def handle_back_requested(self, message: QueryInterfaceWidget.BackRequested) -> None:
+    def handle_back_requested(
+        self, message: QueryInterfaceWidget.BackRequested
+    ) -> None:
         """Handle back button from query mode."""
         self._switch_to_browser_mode()
 
@@ -61,30 +65,32 @@ class CodeQueryApp(App):
         """Switch to query interface mode."""
         if self.current_mode == "query":
             return
-        
+
         # Remove browser widget
         browser = self.query_one("#repo_browser", RepoBrowserWidget)
         browser.remove()
-        
+
         # Mount query widget
-        query_widget = QueryInterfaceWidget(db_path=db_path or self.current_db, id="query_interface")
+        query_widget = QueryInterfaceWidget(
+            db_path=db_path or self.current_db, id="query_interface"
+        )
         self.mount(query_widget, before=self.query_one(Footer))
-        
+
         self.current_mode = "query"
 
     def _switch_to_browser_mode(self) -> None:
         """Switch to repository browser mode."""
         if self.current_mode == "browser":
             return
-        
+
         # Remove query widget
         query = self.query_one("#query_interface", QueryInterfaceWidget)
         query.remove()
-        
+
         # Mount browser widget
         browser = RepoBrowserWidget(id="repo_browser")
         self.mount(browser, before=self.query_one(Footer))
-        
+
         self.current_mode = "browser"
 
     def action_show_help(self) -> None:

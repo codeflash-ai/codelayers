@@ -32,3 +32,8 @@ package = true
 
 [tool.uv.sources]
 typeagent = { path = "../typeagent-py", editable = true }
+
+[dependency-groups]
+dev = [
+    "textual-dev>=1.8.0",
+]

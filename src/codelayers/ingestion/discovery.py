@@ -40,6 +40,7 @@ CONFIG_FILES = {
     "pytest.ini",
 }
 
+
 def discover_files(repo_path: Path, extra_excludes: list[str] = None) -> list[FileKind]:
     """
     Discover relevant files in the repository.

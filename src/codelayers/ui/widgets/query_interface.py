@@ -116,7 +116,10 @@ class QueryInterfaceWidget(Container):
             yield Static("Ready to query", id="status_label")
 
             with Vertical(id="results_container"):
-                yield Markdown("*No results yet. Enter a query to search the codebase.*", id="results_display")
+                yield Markdown(
+                    "*No results yet. Enter a query to search the codebase.*",
+                    id="results_display",
+                )
 
     def on_mount(self) -> None:
         self._scan_for_databases()
@@ -204,7 +207,7 @@ class QueryInterfaceWidget(Container):
 **Error:** {str(e)}
 
 ---
-*Database: {self.current_db.name if self.current_db else 'Unknown'}*
+*Database: {self.current_db.name if self.current_db else "Unknown"}*
 """
             await results_display.update(error_content)
             self._update_status(f"[red]Query failed: {str(e)}[/]")

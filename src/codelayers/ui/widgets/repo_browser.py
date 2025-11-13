@@ -61,8 +61,18 @@ class RepoBrowserWidget(Container):
         tree.auto_expand = False
         yield tree
         with Vertical(id="action_buttons"):
-            yield Button("Ingest Selected", variant="success", id="ingest_button", classes="action_button")
-            yield Button("Query Existing DB", variant="primary", id="query_button", classes="action_button")
+            yield Button(
+                "Ingest Selected",
+                variant="success",
+                id="ingest_button",
+                classes="action_button",
+            )
+            yield Button(
+                "Query Existing DB",
+                variant="primary",
+                id="query_button",
+                classes="action_button",
+            )
 
     def on_mount(self) -> None:
         """Handle widget mount."""

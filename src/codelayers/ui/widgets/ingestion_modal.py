@@ -103,17 +103,10 @@ class StageWidget(Widget):
 
     # Reactive state
     state: reactive[StageState] = reactive(
-        StageState("pending", 0.0, "Waiting to start..."),
-        init=False
+        StageState("pending", 0.0, "Waiting to start..."), init=False
     )
 
-    def __init__(
-        self,
-        title: str,
-        icon: str,
-        initial_detail: str,
-        **kwargs
-    ) -> None:
+    def __init__(self, title: str, icon: str, initial_detail: str, **kwargs) -> None:
         """Initialize the stage widget.
 
         Args:
@@ -147,7 +140,7 @@ class StageWidget(Widget):
             "pending": "⏳ Pending",
             "active": "🔄 Active",
             "complete": "✅ Complete",
-            "error": "❌ Error"
+            "error": "❌ Error",
         }
         status_widget = self.query_one(".stage-status", Static)
         status_widget.update(status_map.get(state.status, state.status))
@@ -300,7 +293,7 @@ class IngestionModal(ModalScreen[Path | None]):
                     title="Discovery Phase",
                     icon="🔍",
                     initial_detail="Scanning repository for Python files...",
-                    id="discovery-stage"
+                    id="discovery-stage",
                 )
                 yield self._discovery_stage
 
@@ -308,7 +301,7 @@ class IngestionModal(ModalScreen[Path | None]):
                     title="Parsing Phase",
                     icon="📝",
                     initial_detail="Waiting for discovery...",
-                    id="parsing-stage"
+                    id="parsing-stage",
                 )
                 yield self._parsing_stage
 
@@ -316,7 +309,7 @@ class IngestionModal(ModalScreen[Path | None]):
                     title="Type Analysis Phase",
                     icon="🔬",
                     initial_detail="Waiting for parsing...",
-                    id="type-analysis-stage"
+                    id="type-analysis-stage",
                 )
                 yield self._type_analysis_stage
 
@@ -324,7 +317,7 @@ class IngestionModal(ModalScreen[Path | None]):
                     title="Message Creation Phase",
                     icon="💬",
                     initial_detail="Waiting for type analysis...",
-                    id="message-creation-stage"
+                    id="message-creation-stage",
                 )
                 yield self._message_creation_stage
 
@@ -332,7 +325,7 @@ class IngestionModal(ModalScreen[Path | None]):
                     title="Indexing Phase",
                     icon="🗄️",
                     initial_detail="Waiting for message creation...",
-                    id="indexing-stage"
+                    id="indexing-stage",
                 )
                 yield self._indexing_stage
 
@@ -345,7 +338,9 @@ class IngestionModal(ModalScreen[Path | None]):
 
             with Horizontal(id="action-buttons"):
                 yield Button("✖ Cancel Ingestion", variant="error", id="cancel-button")
-                with Button("✓ Done", variant="success", id="close-button") as close_btn:
+                with Button(
+                    "✓ Done", variant="success", id="close-button"
+                ) as close_btn:
                     close_btn.display = False
 
     def on_mount(self) -> None:
@@ -357,9 +352,7 @@ class IngestionModal(ModalScreen[Path | None]):
         """Execute the ingestion process."""
         try:
             async for event in run_ingestion(
-                self.repo_path,
-                self.output_db,
-                cancel_event=self._cancel_event
+                self.repo_path, self.output_db, cancel_event=self._cancel_event
             ):
                 if isinstance(event, IngestionProgress):
                     # Update stage widget state

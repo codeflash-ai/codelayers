@@ -293,7 +293,7 @@ async def run_ingestion(
                 return
 
             batch = all_messages[i : i + batch_size]
-            
+
             # Show batch start with preliminary progress
             pre_progress = (batch_num - 1) / total_batches * 100
             yield IngestionProgress(
@@ -304,7 +304,7 @@ async def run_ingestion(
                     f"⚙️ Batch {batch_num}/{total_batches}: Processing {len(batch)} messages - Extracting knowledge...",
                 ),
             )
-            
+
             result = await conversation.add_messages_with_indexing(batch)
             semrefs_added += result.semrefs_added
             messages_added_total += result.messages_added
